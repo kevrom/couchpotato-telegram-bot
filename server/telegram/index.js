@@ -30,20 +30,8 @@ export const getAllUpdates = () => Observable.defer(() =>
     })
 );
 
-export const sendPizzaCommand = ({ message: { from: { id } } }) =>
-  get('sendPhoto', {
-    chat_id: id,
-    photo: 'http://i.imgur.com/msmbzLh.jpg',
-  });
-
 export const sendMessage = (id, message) =>
  get('sendMessage', {
    chat_id: id,
    text: message,
  });
-
-export const unsupportedCommand = ({ message: { from: { id } } }) =>
-  get('sendMessage', {
-    chat_id: id,
-    text: 'Command currently unsupported',
-  });

@@ -1,9 +1,10 @@
 import { Observable } from 'rxjs';
-import { addMovieCommand, searchMoviesCommand } from './couchpotato';
-import { unsupportedCommand, getAllUpdates, sendPizzaCommand } from './telegram';
 import { createLogger } from './utils';
+import { getAllUpdates } from './telegram';
+import { unsupportedCommand, sendPizzaCommand } from './commands';
 
 const log = createLogger();
+
 const actions = {
   '/add': unsupportedCommand,
   '/pizza': sendPizzaCommand,
@@ -31,10 +32,9 @@ const start = () =>
     .concatMapTo(getAllUpdates())
     .map(parseUpdate)
     .filter(v => !!v)
-    .concatMap(update => {
-      return actions[update.command.action](update);
-    });
+    .concatMap(update => actions[update.command.action](update));
 
+log('Starting up Couch Potato Bot');
 start()
   .subscribe(
     v => log(v),

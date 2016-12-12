@@ -22,15 +22,3 @@ export const get = (target, body = {}) => {
   const promise = fetch(fullUrl, options).then(res => res.json());
   return Observable.fromPromise(promise);
 };
-
-const DEFAULT_PROFILE = '849ae8507d1b4a178dd94e1d92d05ef1';
-export const addMovieCommand = update =>
-  get('movie.add', {
-    profile_id: DEFAULT_PROFILE,
-    title: update,
-  });
-
-export const searchMoviesCommand = update =>
-  get('movie.search', {
-    title: update,
-  });
