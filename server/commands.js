@@ -7,6 +7,22 @@ export const unsupportedCommand = ({ message: { from: { id } } }) =>
     text: 'Command currently unsupported',
   });
 
+export const testCommand = ({ message: { from: { id } } }) =>
+  telegramGet('sendMessage', {
+    chat_id: id,
+    text: 'Command currently unsupported',
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: 'Hello', callback_data: JSON.stringify({ type: 'TEST', payload: 'HELLO THERE' }) },
+        ],
+        [
+          { text: 'Suck it', callback_data: JSON.stringify({ type: 'TEST', payload: 'YOU SUCK' }) },
+        ],
+      ],
+    },
+  });
+
 export const sendPizzaCommand = ({ message: { from: { id } } }) =>
   telegramGet('sendPhoto', {
     chat_id: id,

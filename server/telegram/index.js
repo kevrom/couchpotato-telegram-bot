@@ -1,6 +1,5 @@
 import { Observable } from 'rxjs';
 import fetch from 'node-fetch';
-import qs from 'qs';
 import { telegram } from '../../settings';
 
 const { accessToken } = telegram;
@@ -8,9 +7,13 @@ const { accessToken } = telegram;
 export const get = (target, body = {}) => {
   if (!target) { throw new Error('No API target provided'); }
 
-  const fullUrl = `https://api.telegram.org/bot${accessToken}/${target}?${qs.stringify(body)}`;
+  const fullUrl = `https://api.telegram.org/bot${accessToken}/${target}`;
   const options = {
-    method: 'GET',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
   };
   const promise = fetch(fullUrl, options).then(res => res.json());
   return Observable.fromPromise(promise);
