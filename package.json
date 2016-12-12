@@ -1,0 +1,37 @@
+{
+  "name": "couchpotato-telegram",
+  "version": "1.0.0",
+  "description": "couchpotato telegram bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --inspect index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevrom/couchpotato-telegram-bot.git"
+  },
+  "keywords": [
+    "couch",
+    "potato",
+    "telegram",
+    "bot",
+    "couchpotato"
+  ],
+  "author": "Kevin Romano",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kevrom/couchpotato-telegram-bot/issues"
+  },
+  "homepage": "https://github.com/kevrom/couchpotato-telegram-bot#readme",
+  "dependencies": {
+    "babel-core": "^6.20.0",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-async-to-generator": "^6.16.0",
+    "babel-preset-node7": "^1.4.0",
+    "babel-register": "^6.18.0",
+    "node-fetch": "^1.6.3",
+    "qs": "^6.3.0",
+    "rxjs": "^5.0.0-rc.5"
+  }
+}

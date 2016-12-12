@@ -1,0 +1,4 @@
+{
+  "presets": ["node7"],
+  "plugins": ["syntax-async-functions", "babel-plugin-transform-async-to-generator"]
+}
