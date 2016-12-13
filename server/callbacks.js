@@ -1,8 +1,24 @@
-import { get as telegramGet } from './telegram';
+import { Observable } from 'rxjs';
+import { get as telegramGet, sendMessage } from './telegram';
 import { get as couchGet } from './couchpotato';
+import { get as redisGet } from './redis';
 
-export const testCallback = ({ callback_query: { data: { payload }, from: { id } } }) =>
-  telegramGet('sendMessage', {
-    chat_id: id,
-    text: payload,
-  });
+export const testCallback = ({ data: { payload }, from: { id } }) =>
+  sendMessage(id, payload);
+
+const DEFAULT_PROFILE = '849ae8507d1b4a178dd94e1d92d05ef1';
+export const addMovieCallback = ({ data: { payload }, message }) =>
+  redisGet(payload)
+    .map(movie => JSON.parse(movie))
+    .concatMap(movie => Observable.merge(
+      telegramGet('editMessageText', {
+        chat_id: message.chat.id,
+        message_id: message.message_id,
+        text: `${movie.original_title} (${movie.year}) added to the download queue!`,
+      }),
+      couchGet('movie.add', {
+        profile_id: DEFAULT_PROFILE,
+        title: movie.original_title,
+        identifier: movie.imdb,
+      })
+    ));

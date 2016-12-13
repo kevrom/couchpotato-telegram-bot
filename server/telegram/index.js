@@ -33,8 +33,9 @@ export const getAllUpdates = () => Observable.defer(() =>
     })
 );
 
-export const sendMessage = (id, message) =>
+export const sendMessage = (id, message, options) =>
  get('sendMessage', {
    chat_id: id,
    text: message,
+   ...options,
  });

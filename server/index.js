@@ -1,71 +1,57 @@
 import { Observable } from 'rxjs';
-import { createLogger } from './utils';
+import { createLogger, createCallbackParser, createCommandParser } from './utils';
 import { getAllUpdates } from './telegram';
 
 import {
-  unsupportedCommand,
   sendPizzaCommand,
   testCommand,
+  addMovieCommand,
 } from './commands';
 
 import {
   testCallback,
+  addMovieCallback,
 } from './callbacks';
 
 const log = createLogger();
 
-const sinks = {
-  '/add': unsupportedCommand,
+// commands and their sinks
+const commands = {
+  '/add': addMovieCommand,
   '/pizza': sendPizzaCommand,
   '/test': testCommand,
 };
 
+// callbacks and their sinks
 const callbacks = {
   TEST: testCallback,
+  ADD: addMovieCallback,
 };
 
-const parseCallback = update => ({
-  ...update,
-  callback_query: {
-    ...update.callback_query,
-    data: JSON.parse(update.callback_query.data),
-  },
-});
+const commandParser = createCommandParser(commands);
+const callbackParser = createCallbackParser(callbacks);
 
-const parseCommand = update => {
-  const [action, query] = update.message.text.split(' ', 1);
-  if (!Object.keys(sinks).includes(action)) {
-    return false;
-  }
-
-  return {
-    ...update,
-    command: {
-      action,
-      query,
-    },
-  };
-};
-
+// main program loop to pull Telegram updates
 const updateLoop$ = Observable.interval(5000)
   .concatMapTo(getAllUpdates());
 
+// filter callbacks from the main loop and perform necessary parsing
 const callbacks$ = updateLoop$
   .filter(update => !!update.callback_query)
-  .map(parseCallback)
-  .filter(v => !!v)
-  .do(log)
-  .concatMap(update => callbacks[update.callback_query.data.type](update));
+  .map(callbackParser);
 
+// filter commands from the main loop and perform necessary parsing
 const commands$ = updateLoop$
   .filter(update => !!update.message)
-  .map(parseCommand)
+  .map(commandParser);
+
+// merge all streams
+const start = () => Observable.merge(callbacks$, commands$)
   .filter(v => !!v)
   .do(log)
-  .concatMap(update => sinks[update.command.action](update));
+  .concatMap(({ sink, ...update }) => sink(update));
 
-const start = () => Observable.merge(callbacks$, commands$);
-
+// let's get this started
 log('Starting up Couch Potato Bot');
 start()
   .subscribe(
