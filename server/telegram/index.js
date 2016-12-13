@@ -39,3 +39,5 @@ export const sendMessage = (id, message, options) =>
    text: message,
    ...options,
  });
+
+export const sendError = id => sendMessage(id, 'There was an error processing your request');

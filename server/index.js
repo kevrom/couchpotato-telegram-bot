@@ -33,7 +33,7 @@ const callbackParser = createCallbackParser(callbacks);
 
 // main program loop to pull Telegram updates
 const updateLoop$ = Observable.interval(5000)
-  .concatMapTo(getAllUpdates());
+  .concatMapTo(getAllUpdates().retry(5));
 
 // filter callbacks from the main loop and perform necessary parsing
 const callbacks$ = updateLoop$

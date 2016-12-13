@@ -1,5 +1,5 @@
 import uuid from 'uuid/v1';
-import { get as telegramGet, sendMessage } from './telegram';
+import { get as telegramGet, sendMessage, sendError } from './telegram';
 import { get as couchGet } from './couchpotato';
 import { set as redisSet } from './redis';
 
@@ -9,21 +9,23 @@ export const unsupportedCommand = ({ message: { from: { id } } }) =>
 
 export const testCommand = ({ message: { from: { id } }, command: { query } }) =>
   sendMessage(id, 'Command currently unsupported')
-  .concatMapTo(
-    couchGet('search', {
-      q: query,
-    })
-      .map(res => res.movies)
-      .concatMap(movies => movies)
-      .map(movie => ({ title: movie.original_title, titles: movie.titles, imdb: movie.imdb }))
-  );
+    .concatMapTo(
+      couchGet('search', {
+        q: query,
+      })
+        .map(res => res.movies)
+        .concatMap(movies => movies)
+        .map(movie => ({ title: movie.original_title, titles: movie.titles, imdb: movie.imdb }))
+        .catch(() => sendError(id))
+    );
 
 // sends a pic of my cousin eating pizza
 export const sendPizzaCommand = ({ message: { from: { id } } }) =>
   telegramGet('sendPhoto', {
     chat_id: id,
     photo: 'http://i.imgur.com/msmbzLh.jpg',
-  });
+  })
+    .catch(() => sendError(id));
 
 export const addMovieCommand = ({ message: { from: { id } }, command: { query } }) => {
   if (!query) {
@@ -56,5 +58,6 @@ export const addMovieCommand = ({ message: { from: { id } }, command: { query } 
           }])),
         },
       })
-    );
+    )
+    .catch(() => sendError(id));
 };
